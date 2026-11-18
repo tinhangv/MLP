@@ -8,15 +8,17 @@ class MLP:
         self.b = []                              # one array per layer, b[i] is (sizes[i + 1],)
         # initialize weights and biases
         for in_dim, out_dim in zip(sizes[:-1], sizes[1:]):
-            self.W.append(rng.standard_normal((in_dim, out_dim)))    # randomize weights  between (-1,1)            
+            self.W.append(rng.standard_normal((in_dim, out_dim)))    # randomize weights, between (-1,1)            
             self.b.append(np.zeros(out_dim))                         # zero biases
+        self.hidden_activation = hidden_activation
+        self.output_activation = output_activation
         self.loss_fn = loss_fn
 
     def forward(self, x):                       
         for W, b in zip(self.W[:-1], self.b[:-1]):   # every layer except the last
-            x = self.hidden_activation.forward(x @ W + b)
+            x = self.hidden_activation.apply(x @ W + b)
         W, b = self.W[-1], self.b[-1]                # the output layer
-        return self.output_activation.forward(x @ W + b)
+        return self.output_activation.apply(x @ W + b)
     
     def backward(self): ...                      # same loop, reversed
     def step(self, lr): ...                      # update every W and b
@@ -40,7 +42,9 @@ class MLP:
                 self.backward()
                 self.step(lr)
 
-    def predict(self, x): ...
+    def predict(self, x): 
+        y_hat = self.forward(x)
+        return np.argmax(y_hat, axis = 1)
 
 class ReLU:
     def apply(self, x): ...
