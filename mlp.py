@@ -1,6 +1,5 @@
 import numpy as np
-from abc import ABC, abstractmethod
-rng = np.random.default_rng
+rng = np.random.default_rng(0)
 
 class MLP:
     def __init__(self, sizes, hidden_activation, output_activation, loss_fn):
@@ -19,23 +18,41 @@ class MLP:
         W, b = self.W[-1], self.b[-1]                # the output layer
         return self.output_activation.forward(x @ W + b)
     
-    def loss(self, logits, y): ...
     def backward(self): ...                      # same loop, reversed
     def step(self, lr): ...                      # update every W and b
-    def fit(self, x, y, epochs, lr): ...
+
+    def fit(self, x, y, epochs, lr, batch_size=None): 
+        n = len(x)  # number of samples in training set
+        for _ in range(epochs): # main training loop
+            if batch_size is None: # regular, entire dataset gradient descent
+                slices = [np.arange(n)]
+            else: # stochastic gradient descent, process one epoch in batches
+                order = rng.permutation(n) # shuffle the samples
+
+                # organize into batches
+                # each slice is an array of indices
+                slices = [order[s:s + batch_size] for s in range(0, n, batch_size)] 
+            for idx in slices:
+                # predicted outputs
+                # x[idx] selects samples of x with the corresponding indices, forming a batch
+                y_hat = self.forward(x[idx])     
+                self.loss_fn.loss(y_hat, y[idx])    
+                self.backward()
+                self.step(lr)
+
     def predict(self, x): ...
 
 class ReLU:
-    def forward(self, x): ...
-    def backward(self, grad):...
+    def apply(self, x): ...
+    def chain(self, grad):...
 
 class SoftMax:
-    def forward(self, z):...
-    def backward(self, grad):...
+    def apply(self, z):...
+    def chain(self, grad):...
 
 class CrossEntropy:
-    def forward(self, y_hat, y):...
-    def backward(self):...
+    def loss(self, y_hat, y):...
+    def gradient(self):...
 
 if __name__ == "__main__":
     # example usage
