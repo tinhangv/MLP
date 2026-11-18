@@ -10,6 +10,7 @@ class MLP:
         for in_dim, out_dim in zip(sizes[:-1], sizes[1:]):
             self.W.append(rng.standard_normal((in_dim, out_dim)))    # randomize weights, between (-1,1)            
             self.b.append(np.zeros(out_dim))                         # zero biases
+            
         self.hidden_activation = hidden_activation
         self.output_activation = output_activation
         self.loss_fn = loss_fn
@@ -47,7 +48,8 @@ class MLP:
         return np.argmax(y_hat, axis = 1)
 
 class ReLU:
-    def apply(self, x): ...
+    def apply(self, z): 
+        return np.maximum(0, z)
     def chain(self, grad):...
 
 class SoftMax:
