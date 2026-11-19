@@ -35,8 +35,8 @@ class MLP:
             if i < last:
                 grad = self.hidden_activation.chain(grad)      # through ReLU, before the weight gradient
             x = self.inputs[i]                                 # (N, in)
-            self.dW[i] = x.T @ grad / len(x)                   # (in, out), same shape as W[i]
-            self.db[i] = grad.mean(axis=0)                     # (out,), same shape as b[i]
+            self.dW[i] = x.T @ grad                            # (in, out), same shape as W[i]
+            self.db[i] = grad.sum(axis=0)                      # (out,), same shape as b[i]
             grad = grad @ self.W[i].T                         # (N, in), gradient for the previous layer
 
     def step(self, lr):
