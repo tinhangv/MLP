@@ -1,9 +1,14 @@
 """Convert a folder of handwritten digits to 28 x 28 grayscale PNGs."""
 
+import sys
 from pathlib import Path
 
 import numpy as np
 from PIL import Image, ImageOps
+
+ROOT = Path(__file__).resolve().parent.parent
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
 
 from train_mnist import IMAGE_SIZE
 

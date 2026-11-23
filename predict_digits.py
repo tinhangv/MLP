@@ -20,10 +20,11 @@ def load_model(path):
 
 
 def main():
-    root = Path(__file__).resolve().parent
-    paths = sorted((root / "processed_digits").glob("*.png"))
+    root = Path(__file__).resolve().parent / "mnist"
+    digits = root / "processed_digits"
+    paths = sorted(digits.glob("*.png"))
     if not paths:
-        print("No converted PNGs found in processed_digits. Run convert_digits.py first.")
+        print(f"No converted PNGs found in {digits}. Run mnist/convert_digits.py first.")
         return 1
 
     model = load_model(root / "mnist_model.npz")
@@ -39,6 +40,7 @@ def main():
             failed = True
             continue
 
+        # use the trained MLP model to predict the digit
         digit = model.predict(model_inputs(pixels[None]))[0]
         print(f"{path.name}: {digit}")
 

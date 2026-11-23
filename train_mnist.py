@@ -16,7 +16,7 @@ def model_inputs(images):
 
 
 def main():
-    folder = Path(__file__).resolve().parent
+    folder = Path(__file__).resolve().parent / "mnist"
     dataset = folder / "mnist.npz"
     if not dataset.is_file():
         raise SystemExit(f"Place the downloaded MNIST file at {dataset} and run again.")
