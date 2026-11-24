@@ -1,5 +1,6 @@
 """Train the scratch MLP and CNN to recognize MNIST digits."""
 
+import time
 from pathlib import Path
 
 import numpy as np
@@ -43,7 +44,9 @@ def main():
         weights *= np.sqrt(2 / weights.shape[0])
 
     print("Training MLP for 10 epochs...", flush=True)
+    started = time.perf_counter()
     mlp.fit(mlp_inputs(x_train), y_train, epochs=10, lr=0.1, batch_size=128)
+    mlp_time = time.perf_counter() - started
     mlp_pred = mlp.predict(mlp_inputs(x_test))
 
     filters = (8, 16)
@@ -52,7 +55,9 @@ def main():
               loss_fn=CrossEntropy(),
               kernel_size=3, stride=1, padding=1)
     print("Training CNN for 10 epochs...", flush=True)
+    started = time.perf_counter()
     cnn.fit(cnn_inputs(x_train), y_train, epochs=10, lr=0.1, batch_size=128)
+    cnn_time = time.perf_counter() - started
     test_images = cnn_inputs(x_test)
     cnn_pred = np.concatenate([
         cnn.predict(test_images[start:start + 512])
@@ -62,6 +67,8 @@ def main():
     print()
     print(f"{'MLP accuracy':<16} {np.mean(mlp_pred == y_test):.2%}")
     print(f"{'CNN accuracy':<16} {np.mean(cnn_pred == y_test):.2%}")
+    print(f"{'MLP time':<16} {mlp_time:.1f}s")
+    print(f"{'CNN time':<16} {cnn_time:.1f}s")
 
     # Save both networks so predict_digits.py can reuse the trained weights.
     np.savez(folder / "mlp_model.npz", sizes=sizes,
